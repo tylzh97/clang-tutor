@@ -31,8 +31,14 @@ jobs:
           brew install lit
       - name: Set LLVM_CONFIG_EXECUTABLE ENV
         run: |
-          find /usr -name "llvm-config"
-          echo "PATH=/usr/lib/llvm-19/bin:$PATH" >> $GITHUB_ENV
+          LLVM_CONFIG=$(find / -type f -executable -name "llvm-config" 2>/dev/null | head -n 1)
+          if [ -n "$LLVM_CONFIG" ]; then
+            echo "LLVM_CONFIG_PATH=$LLVM_CONFIG" >> $GITHUB_ENV
+            echo "Found llvm-config at: $LLVM_CONFIG"
+          else
+            echo "Error: llvm-config not found"
+            exit 1
+          fi
       - name: Build HelloWorld
         run: |
           cd HelloWorld
