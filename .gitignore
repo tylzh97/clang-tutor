@@ -33,3 +33,6 @@
 
 .idea
 *build*
+
+# Nix
+\result
