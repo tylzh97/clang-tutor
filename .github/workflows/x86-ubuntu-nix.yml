@@ -1,0 +1,49 @@
+name: Nix Flake CI
+
+on:
+  push:
+    branches: [ "main" ] 
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      # Step 1: Checkout this tutorial
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install & Configure the Nix Environment
+      - name: Install and configure Nix
+        run: |
+          # Install using the official Nix installation script
+          curl -fsSL https://nixos.org/nix/install | sh -s -- --daemon
+
+          # Add the binary path of nix to PATH
+          export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+
+          # Enable the Nix Flakes feature for Nix
+          sudo mkdir -p /etc/nix
+          echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+          echo "sandbox = false" | sudo tee -a /etc/nix/nix.conf
+          
+          # Set environment variables for GitHub Actions
+          echo "/nix/var/nix/profiles/default/bin" >> $GITHUB_PATH
+          echo "NIX_PROFILES=/nix/var/nix/profiles/default /root/.nix-profile" >> $GITHUB_ENV
+          
+          # Register a stable release for nix
+          # Verified that LLVM 19 in version `release-24.05` runs this tutorial smoothly
+          nix registry add nixpkgs github:NixOS/nixpkgs/release-24.05
+
+      # Step 3: Install Python & llvm-lit tools
+      - name: Install Python and lit
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+          pip3 install --upgrade lit --break-system-packages
+
+      # Step 4: Test with Nix Flake
+      - name: Build Nix Flake
+        run: |
+          nix build -L
