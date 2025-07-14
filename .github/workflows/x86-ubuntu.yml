@@ -28,6 +28,10 @@ jobs:
           sudo apt-get install python3-setuptools
           sudo apt-get install ${{ matrix.compiler.CXX }}
           sudo pip3 install lit
+      - name: Set LLVM_CONFIG_EXECUTABLE ENV
+        run: |
+          find / -name "llvm-config"
+          echo "LLVM_CONFIG_EXECUTABLE=/usr/lib/llvm-19/bin/llvm-config" >> $GITHUB_ENV
       - name: Build HelloWorld
         env:
           CC: ${{ matrix.compiler.CC }}

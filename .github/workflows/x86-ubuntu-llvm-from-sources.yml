@@ -41,6 +41,9 @@ jobs:
             -DLLVM_OPTIMIZED_TABLEGEN=ON \
             ../llvm
           ninja
+      - name: Set LLVM_CONFIG_EXECUTABLE ENV
+        run: |
+          echo "LLVM_CONFIG_EXECUTABLE=/usr/lib/llvm-19/bin/llvm-config" >> $GITHUB_ENV
       - name: Install lit
         run: |
           sudo apt-get install python3-setuptools
