@@ -31,7 +31,7 @@ jobs:
       - name: Set LLVM_CONFIG_EXECUTABLE ENV
         run: |
           find /usr -name "llvm-config"
-          echo "LLVM_CONFIG_EXECUTABLE=/usr/lib/llvm-19/bin/llvm-config" >> $GITHUB_ENV
+          echo "PATH=/usr/lib/llvm-19/bin:$PATH" >> $GITHUB_ENV
       - name: Build HelloWorld
         env:
           CC: ${{ matrix.compiler.CC }}
