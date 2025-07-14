@@ -38,6 +38,10 @@ jobs:
       - name: Install lit
         run: |
           brew install lit
+      - name: Set LLVM_CONFIG_EXECUTABLE ENV
+        run: |
+          find /usr -name "llvm-config"
+          echo "PATH=/usr/lib/llvm-19/bin:$PATH" >> $GITHUB_ENV
       - name: Build HelloWorld
         run: |
           cd HelloWorld
