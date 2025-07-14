@@ -1,13 +1,10 @@
-# -*- Python -*-
+# lit.cfg.py
 
-# Configuration file for the 'lit' test runner.
-
-import platform
-
+import os
+import shutil
 import lit.formats
 # Global instance of LLVMConfig provided by lit
 from lit.llvm import llvm_config
-from lit.llvm.subst import ToolSubst
 
 # name: The name of this test suite.
 # (config is an instance of TestingConfig created when discovering tests)
@@ -33,13 +30,34 @@ config.test_source_root = os.path.dirname(__file__)
 # directories.
 config.excludes = ['Inputs']
 
-# The list of tools required for testing - prepend them with the path specified
-# during configuration (i.e. LT_LLVM_TOOLS_DIR/bin)
-tools = ["FileCheck", "clang", "clang++"]
-llvm_config.add_tool_substitutions(tools, config.llvm_tools_dir)
+# 测试执行文件的根目录 (通常是 CMake 构建目录下的 test 目录)
+# lit 会自动推断这个，但如果需要可以显式设置
+# config.test_exec_root = ...
 
-# The LIT variable to hold the file extension for shared libraries (this is
-# platform dependent)
+# 测试使用的格式 (ShTest 是一个很好的默认值，它会执行 RUN: 行的 shell 命令)
+config.test_format = lit.formats.ShTest(True)
+
+# The list of tools required for testing
+tools_to_find = [
+    "FileCheck",
+    "clang",
+    "clang++"
+]
+
+# 去除了对于 CT_Clang_INSTALL_DIR=$Clang_DIR 的依赖
+# 使用 shutil.which 来查找工具路径
+for tool_name in tools_to_find:
+    tool_path = shutil.which(tool_name)
+    # 如果在 PATH 中找不到工具，则测试无法进行，立即报错并退出
+    if tool_path is None:
+        config.lit_config.fatal(
+            f"Tool '{tool_name}' not found in PATH. "
+            f"Please ensure it is available in your environment (e.g., via nix-shell)."
+        )
+    # 将工具路径添加到 substitutions 中
+    substitution = f"%{tool_name}"
+    config.substitutions.append((substitution, tool_path))
+
 config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
 # The LIT variable to hold the location of plugins/libraries
 config.substitutions.append(('%shlibdir', config.llvm_shlib_dir))
