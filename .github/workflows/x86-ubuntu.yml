@@ -30,7 +30,7 @@ jobs:
           sudo pip3 install lit
       - name: Set LLVM_CONFIG_EXECUTABLE ENV
         run: |
-          find / -name "llvm-config"
+          find /usr -name "llvm-config"
           echo "LLVM_CONFIG_EXECUTABLE=/usr/lib/llvm-19/bin/llvm-config" >> $GITHUB_ENV
       - name: Build HelloWorld
         env:

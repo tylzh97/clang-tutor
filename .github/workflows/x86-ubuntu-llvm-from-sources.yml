@@ -43,6 +43,7 @@ jobs:
           ninja
       - name: Set LLVM_CONFIG_EXECUTABLE ENV
         run: |
+          find /usr -name "llvm-config"
           echo "LLVM_CONFIG_EXECUTABLE=/usr/lib/llvm-19/bin/llvm-config" >> $GITHUB_ENV
       - name: Install lit
         run: |
