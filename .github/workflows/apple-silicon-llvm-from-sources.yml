@@ -1,6 +1,9 @@
 name: Apple Silicon (from sources)
 
 on:
+  push:
+  pull_request:
+    branches: [ main ]
   schedule:
     - cron:  '0 0 * * *'
   workflow_dispatch:
@@ -35,6 +38,10 @@ jobs:
             -DDEFAULT_SYSROOT="$(xcrun --show-sdk-path)" \
             ../llvm
           ninja
+      - name: Add LLVM to PATH
+        run: |
+          ls -lah "${GITHUB_WORKSPACE}/llvm-project/build/bin"
+          echo "${GITHUB_WORKSPACE}/llvm-project/build/bin" >> $GITHUB_PATH
       - name: Install lit
         run: |
           brew install lit
